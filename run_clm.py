@@ -54,6 +54,8 @@ from transformers.trainer_utils import get_last_checkpoint
 from transformers.utils import check_min_version, send_example_telemetry
 from transformers.utils.versions import require_version
 
+from utils import batch_tokenize_preprocess
+
 
 # Will error if the minimal version of Transformers is not installed. Remove at your own risks.
 check_min_version("4.31.0")
@@ -504,21 +506,8 @@ def main():
         return output
 
     with training_args.main_process_first(desc="dataset map tokenization"):
-        if not data_args.streaming:
-            tokenized_datasets = raw_datasets.map(
-                tokenize_function,
-                batched=True,
-                num_proc=data_args.preprocessing_num_workers,
-                remove_columns=column_names,
-                load_from_cache_file=not data_args.overwrite_cache,
-                desc="Running tokenizer on dataset",
-            )
-        else:
-            tokenized_datasets = raw_datasets.map(
-                tokenize_function,
-                batched=True,
-                remove_columns=column_names,
-            )
+        # Consider data_args.streaming is False
+        tokenized_datasets = raw_datasets
 
     if data_args.block_size is None:
         block_size = tokenizer.model_max_length
@@ -563,37 +552,38 @@ def main():
     # https://huggingface.co/docs/datasets/package_reference/main_classes.html#datasets.Dataset.map
 
     with training_args.main_process_first(desc="grouping texts together"):
-        if not data_args.streaming:
-            lm_datasets = tokenized_datasets.map(
-                group_texts,
-                batched=True,
-                num_proc=data_args.preprocessing_num_workers,
-                load_from_cache_file=not data_args.overwrite_cache,
-                desc=f"Grouping texts in chunks of {block_size}",
-            )
-        else:
-            lm_datasets = tokenized_datasets.map(
-                group_texts,
-                batched=True,
-            )
+        train_dataset = tokenized_datasets['train'].map(
+            lambda batch: batch_tokenize_preprocess(batch, tokenizer),
+            batched=True,
+        )
+
+        test_dataset = tokenized_datasets['test'].map(
+            lambda batch: batch_tokenize_preprocess(batch, tokenizer),
+            batched=True,
+        )
+
+        eval_dataset = tokenized_datasets['validation'].map(
+            lambda batch: batch_tokenize_preprocess(batch, tokenizer),
+            batched=True,
+        )
 
     if training_args.do_train:
         if "train" not in tokenized_datasets:
             raise ValueError("--do_train requires a train dataset")
-        train_dataset = lm_datasets["train"]
+        # train_dataset = lm_datasets["train"]
         if data_args.max_train_samples is not None:
             max_train_samples = min(
                 len(train_dataset), data_args.max_train_samples)
-            train_dataset = train_dataset.select(range(max_train_samples))
+            # train_dataset = train_dataset.select(range(max_train_samples))
 
     if training_args.do_eval:
         if "validation" not in tokenized_datasets:
             raise ValueError("--do_eval requires a validation dataset")
-        eval_dataset = lm_datasets["validation"]
+        # eval_dataset = lm_datasets["validation"]
         if data_args.max_eval_samples is not None:
             max_eval_samples = min(
                 len(eval_dataset), data_args.max_eval_samples)
-            eval_dataset = eval_dataset.select(range(max_eval_samples))
+            # eval_dataset = eval_dataset.select(range(max_eval_samples))
 
         def preprocess_logits_for_metrics(logits, labels):
             if isinstance(logits, tuple):
