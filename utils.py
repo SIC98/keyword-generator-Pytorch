@@ -8,27 +8,12 @@ nltk.download("punkt", quiet=True)
 metric = datasets.load_metric("rouge")
 
 
-def postprocess_text(preds, labels):
-    preds = [pred.strip() for pred in preds]
-    labels = [label.strip() for label in labels]
-
-    # rougeLSum expects newline after each sentence
-    preds = ["\n".join(nltk.sent_tokenize(pred)) for pred in preds]
-    labels = ["\n".join(nltk.sent_tokenize(label)) for label in labels]
-
-    return preds, labels
-
-
 def compute_metrics(tokenizer, eval_preds):
     preds, labels = eval_preds
     decoded_preds = tokenizer.batch_decode(preds, skip_special_tokens=True)
     # Replace -100 in the labels as we can't decode them.
     labels = np.where(labels != -100, labels, tokenizer.pad_token_id)
     decoded_labels = tokenizer.batch_decode(labels, skip_special_tokens=True)
-
-    # Some simple post-processing
-    decoded_preds, decoded_labels = postprocess_text(
-        decoded_preds, decoded_labels)
 
     result = metric.compute(
         predictions=decoded_preds, references=decoded_labels, use_stemmer=True
