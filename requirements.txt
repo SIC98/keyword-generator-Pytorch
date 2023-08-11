@@ -9,3 +9,4 @@ transformers == 4.31.0
 nltk
 transformers
 rouge-score
+pytorch_lightning
