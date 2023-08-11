@@ -558,7 +558,9 @@ def main():
         # Use load_from_cache_file=False if preprocess function or dataset is updated
         lm_datasets = tokenized_datasets.map(preprocess)
         lm_datasets = lm_datasets.map(
-            lambda batch: batch_tokenize_preprocess(batch, tokenizer),
+            lambda batch: batch_tokenize_preprocess(
+                batch, tokenizer, "Prompt"
+            ),
             batched=True,
         )
 

@@ -62,8 +62,8 @@ def compute_accuracy_metrics(eval_preds):
     return accuracy_metric.compute(predictions=preds, references=labels)
 
 
-def batch_tokenize_preprocess(batch, tokenizer):
-    source = batch['Prompt']
+def batch_tokenize_preprocess(batch, tokenizer, key):
+    source = batch[key]
     source_tokenized = tokenizer(
         source, padding='max_length', truncation=False, max_length=1024
     )
