@@ -15,7 +15,7 @@ def get_data_until_kth_comma(s, k):
         # If there is not enough comma
         if index == -1:
             return s
-    return s[:index]
+    return s[:index + 1]
 
 
 def compute_rouge_metrics(tokenizer, eval_preds):
