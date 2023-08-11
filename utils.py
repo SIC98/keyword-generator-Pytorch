@@ -1,11 +1,13 @@
 import numpy as np
 import datasets
+import evaluate
 import nltk
 import re
 
 nltk.download("punkt", quiet=True)
 
-metric = datasets.load_metric("rouge")
+rouge_metric = datasets.load_metric("rouge")
+accuracy_metric = evaluate.load("accuracy")
 
 
 def get_data_until_kth_comma(s, k):
@@ -18,7 +20,7 @@ def get_data_until_kth_comma(s, k):
     return s[:index]
 
 
-def compute_metrics(tokenizer, eval_preds):
+def compute_rouge_metrics(tokenizer, eval_preds):
     preds, labels = eval_preds
     decoded_preds = tokenizer.batch_decode(preds, skip_special_tokens=True)
     # Replace -100 in the labels as we can't decode them.
@@ -31,7 +33,7 @@ def compute_metrics(tokenizer, eval_preds):
         ) for decoded_pred, decoded_label in zip(decoded_preds, decoded_labels)
     ]
 
-    result = metric.compute(
+    result = rouge_metric.compute(
         predictions=decoded_preds, references=decoded_labels, use_stemmer=True
     )
     # Extract a few results from ROUGE
@@ -44,6 +46,22 @@ def compute_metrics(tokenizer, eval_preds):
 
     result = {k: round(v, 4) for k, v in result.items()}
     return result
+
+
+def compute_accuracy_metrics(eval_preds):
+    preds, labels = eval_preds
+    # preds have the same shape as the labels, after the argmax(-1) has been calculated
+    # by preprocess_logits_for_metrics but we need to shift the labels
+    labels = labels[:, 1:].reshape(-1)
+    preds = preds[:, :-1].reshape(-1)
+
+    # -100 is padding. We don't want to calculate accuracy for padding
+    valid_indices = np.where(labels != -100)[0]
+
+    labels = labels[valid_indices]
+    preds = preds[valid_indices]
+
+    return accuracy_metric.compute(predictions=preds, references=labels)
 
 
 def batch_tokenize_preprocess(batch, tokenizer):
