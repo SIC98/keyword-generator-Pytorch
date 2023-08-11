@@ -25,9 +25,11 @@ def compute_metrics(tokenizer, eval_preds):
     labels = np.where(labels != -100, labels, tokenizer.pad_token_id)
     decoded_labels = tokenizer.batch_decode(labels, skip_special_tokens=True)
 
-    decoded_preds = get_data_until_kth_comma(
-        decoded_preds, decoded_labels.count(',')
-    )
+    decoded_preds = [
+        get_data_until_kth_comma(
+            decoded_pred, decoded_label.count(',') + 1
+        ) for decoded_pred, decoded_label in zip(decoded_preds, decoded_labels)
+    ]
 
     result = metric.compute(
         predictions=decoded_preds, references=decoded_labels, use_stemmer=True
