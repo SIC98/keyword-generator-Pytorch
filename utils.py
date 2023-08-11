@@ -8,14 +8,52 @@ rouge_metric = evaluate.load('rouge')
 accuracy_metric = evaluate.load('accuracy')
 
 
-def get_data_until_kth_comma(s, k):
+def get_data_until_kth_comma(s, k, contain_last_comma):
     index = -1
     for _ in range(k):
         index = s.find(',', index + 1)
         # If there is not enough comma
         if index == -1:
             return s
-    return s[:index + 1]
+
+    if contain_last_comma:
+        index = index + 1
+
+    return s[:index]
+
+
+def inference_preprocess(data, key):
+    prompt = data[key]
+    total_comma = prompt.count(',')
+
+    data['total_comma'] = total_comma
+    data['one_keyword'] = get_data_until_kth_comma(prompt, 1, True)
+    data['two_keyword'] = get_data_until_kth_comma(prompt, 2, True)
+
+    return data
+
+
+def batch_inference(batch, model, input_type, tokenizer, device):
+    front_keywords = batch[input_type]
+
+    encodings_dict = tokenizer.batch_encode_plus(
+        front_keywords, return_tensors="pt", padding=True)
+
+    input_ids = encodings_dict['input_ids'].to(device)
+    attention_mask = encodings_dict['attention_mask'].to(device)
+
+    output_sequences = model.generate(
+        input_ids=input_ids,
+        attention_mask=attention_mask,
+        max_length=1024
+    )
+
+    generated_text = tokenizer.batch_decode(
+        output_sequences, skip_special_tokens=True, clean_up_tokenization_spaces=True
+    )
+    batch['generated_text'] = generated_text
+
+    return batch
 
 
 def compute_rouge_metrics(tokenizer, eval_preds):
@@ -27,7 +65,7 @@ def compute_rouge_metrics(tokenizer, eval_preds):
 
     decoded_preds = [
         get_data_until_kth_comma(
-            decoded_pred, decoded_label.count(',') + 1
+            decoded_pred, decoded_label.count(',') + 1, False
         ) for decoded_pred, decoded_label in zip(decoded_preds, decoded_labels)
     ]
 
