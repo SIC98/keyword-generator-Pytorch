@@ -4,8 +4,8 @@ import evaluate
 import nltk
 import re
 
-rouge_metric = datasets.load_metric("rouge")
-accuracy_metric = evaluate.load("accuracy")
+rouge_metric = evaluate.load('rouge')
+accuracy_metric = evaluate.load('accuracy')
 
 
 def get_data_until_kth_comma(s, k):
