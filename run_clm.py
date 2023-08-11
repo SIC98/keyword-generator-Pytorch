@@ -555,6 +555,7 @@ def main():
 
     with training_args.main_process_first(desc="grouping texts together"):
 
+        # Use load_from_cache_file=False if preprocess function or dataset is updated
         lm_datasets = tokenized_datasets.map(preprocess)
         lm_datasets = lm_datasets.map(
             lambda batch: batch_tokenize_preprocess(batch, tokenizer),
