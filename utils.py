@@ -8,12 +8,26 @@ nltk.download("punkt", quiet=True)
 metric = datasets.load_metric("rouge")
 
 
+def get_data_until_kth_comma(s, k):
+    index = -1
+    for _ in range(k):
+        index = s.find(',', index + 1)
+        # If there is not enough comma
+        if index == -1:
+            return s
+    return s[:index]
+
+
 def compute_metrics(tokenizer, eval_preds):
     preds, labels = eval_preds
     decoded_preds = tokenizer.batch_decode(preds, skip_special_tokens=True)
     # Replace -100 in the labels as we can't decode them.
     labels = np.where(labels != -100, labels, tokenizer.pad_token_id)
     decoded_labels = tokenizer.batch_decode(labels, skip_special_tokens=True)
+
+    decoded_preds = get_data_until_kth_comma(
+        decoded_preds, decoded_labels.count(',')
+    )
 
     result = metric.compute(
         predictions=decoded_preds, references=decoded_labels, use_stemmer=True
