@@ -586,8 +586,6 @@ def main():
                 logits = logits[0]
             return logits.argmax(dim=-1)
 
-        metric = evaluate.load("accuracy")
-
     # Initialize our Trainer
     trainer = Trainer(
         model=model,
