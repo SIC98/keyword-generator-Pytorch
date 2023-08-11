@@ -554,11 +554,12 @@ def main():
     # https://huggingface.co/docs/datasets/package_reference/main_classes.html#datasets.Dataset.map
 
     with training_args.main_process_first(desc="grouping texts together"):
-        lm_datasets = tokenized_datasets.map(
+
+        lm_datasets = tokenized_datasets.map(preprocess)
+        lm_datasets = lm_datasets.map(
             lambda batch: batch_tokenize_preprocess(batch, tokenizer),
             batched=True,
         )
-        lm_datasets = lm_datasets.map(preprocess)
 
     if training_args.do_train:
         if "train" not in tokenized_datasets:
