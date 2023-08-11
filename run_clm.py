@@ -562,6 +562,9 @@ def main():
             batched=True,
         )
 
+        # Save dataset to disk for eval.py
+        lm_datasets.save_to_disk("lexica-data")
+
     if training_args.do_train:
         if "train" not in tokenized_datasets:
             raise ValueError("--do_train requires a train dataset")
