@@ -4,8 +4,6 @@ import evaluate
 import nltk
 import re
 
-nltk.download("punkt", quiet=True)
-
 rouge_metric = datasets.load_metric("rouge")
 accuracy_metric = evaluate.load("accuracy")
 
