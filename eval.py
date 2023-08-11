@@ -65,8 +65,8 @@ def main():
         )
         reference = data['Prompt']
 
-        prediction = prediction.split(', ', split_index)[1]
-        reference = reference.split(', ', split_index)[1]
+        prediction = prediction.split(', ', split_index)[split_index]
+        reference = reference.split(', ', split_index)[split_index]
 
         predictions.append(prediction)
         references.append(reference)
