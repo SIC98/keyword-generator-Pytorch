@@ -43,7 +43,7 @@ def main():
 
     dataset = load_from_disk("lexica-data")
     del dataset['train']
-    del dataset['validation']
+    del dataset['test']
 
     dataset = dataset.map(lambda data: inference_preprocess(data, "Prompt"))
     dataset = dataset.filter(lambda example: example["total_comma"] > 2)
@@ -57,7 +57,7 @@ def main():
     predictions = []
     references = []
 
-    for data in dataset['test']:
+    for data in dataset['validation']:
         prediction = get_data_until_kth_comma(
             data['generated_text'],
             data['total_comma'] + 1,
