@@ -42,11 +42,22 @@ def batch_inference(batch, model, input_type, tokenizer, device):
     input_ids = encodings_dict['input_ids'].to(device)
     attention_mask = encodings_dict['attention_mask'].to(device)
 
+    # 1. Greedy Search
     output_sequences = model.generate(
         input_ids=input_ids,
         attention_mask=attention_mask,
-        max_length=1024
+        max_length=1024,
+        no_repeat_ngram_size=3
     )
+
+    # 2. Beam Search
+    # output_sequences = model.generate(
+    #     input_ids=input_ids,
+    #     attention_mask=attention_mask,
+    #     max_length=1024,
+    #     num_beams=3,
+    #     no_repeat_ngram_size=3
+    # )
 
     generated_text = tokenizer.batch_decode(
         output_sequences, skip_special_tokens=True, clean_up_tokenization_spaces=True
