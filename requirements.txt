@@ -10,3 +10,5 @@ nltk
 transformers
 rouge-score
 pytorch_lightning
+keybert
+rouge_score
