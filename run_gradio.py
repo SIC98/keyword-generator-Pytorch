@@ -10,9 +10,9 @@ from utils import get_data_until_kth_comma
 
 parser = argparse.ArgumentParser()
 
-parser.add_argument('--model_name_or_path', type=str)
-parser.add_argument('--device', type=str)
-parser.add_argument('--fp16', action='store_true')
+parser.add_argument("--model_name_or_path", type=str)
+parser.add_argument("--device", type=str)
+parser.add_argument("--fp16", action="store_true")
 
 args = parser.parse_args()
 

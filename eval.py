@@ -14,22 +14,22 @@ def main():
 
     parser = argparse.ArgumentParser()
 
-    parser.add_argument('--model_name_or_path', type=str)
-    parser.add_argument('--device', type=str)
-    parser.add_argument('--batch_size', type=int)
-    parser.add_argument('--fp16', action='store_true')
-    parser.add_argument('--input_type', type=str,
-                        choices=['one_keyword', 'two_keyword'])
+    parser.add_argument("--model_name_or_path", type=str)
+    parser.add_argument("--device", type=str)
+    parser.add_argument("--batch_size", type=int)
+    parser.add_argument("--fp16", action="store_true")
+    parser.add_argument("--input_type", type=str,
+                        choices=["one_keyword", "two_keyword"])
 
     args = parser.parse_args()
 
-    if args.input_type == 'one_keyword':
+    if args.input_type == "one_keyword":
         split_index = 1
-    elif args.input_type == 'two_keyword':
+    elif args.input_type == "two_keyword":
         split_index = 2
 
     tokenizer = GPT2Tokenizer.from_pretrained(
-        args.model_name_or_path, padding_side='left'
+        args.model_name_or_path, padding_side="left"
     )
 
     # add the EOS token as PAD token to avoid warnings
@@ -42,8 +42,8 @@ def main():
         model = model.half()
 
     dataset = load_from_disk("lexica-data")
-    del dataset['train']
-    del dataset['test']
+    del dataset["train"]
+    del dataset["test"]
 
     dataset = dataset.map(lambda data: inference_preprocess(data, "Prompt"))
     dataset = dataset.filter(lambda example: example["total_comma"] > 2)
@@ -57,21 +57,21 @@ def main():
     predictions = []
     references = []
 
-    for data in dataset['validation']:
+    for data in dataset["validation"]:
         prediction = get_data_until_kth_comma(
-            data['generated_text'],
-            data['total_comma'] + 1,
+            data["generated_text"],
+            data["total_comma"] + 1,
             False
         )
-        reference = data['Prompt']
+        reference = data["Prompt"]
 
-        prediction = prediction.split(', ', split_index)[split_index]
-        reference = reference.split(', ', split_index)[split_index]
+        prediction = prediction.split(", ", split_index)[split_index]
+        reference = reference.split(", ", split_index)[split_index]
 
         predictions.append(prediction)
         references.append(reference)
 
-    rouge_metric = evaluate.load('rouge')
+    rouge_metric = evaluate.load("rouge")
 
     rouge_score = rouge_metric.compute(
         predictions=predictions, references=references, use_stemmer=True
@@ -80,5 +80,5 @@ def main():
     print(rouge_score)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()
