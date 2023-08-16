@@ -32,21 +32,15 @@ if args.fp16:
 
 def greet(keywords, total_keywords):
 
-    parser = argparse.ArgumentParser()
-
-    parser.add_argument('--model_name_or_path', type=str)
-    parser.add_argument('--device', type=str)
-    parser.add_argument('--fp16', action='store_true')
-
-    args = parser.parse_args()
-
     encodings_dict = tokenizer(
         keywords,
         max_length=1024,
         return_tensors="pt",
     )
     input_ids = encodings_dict.input_ids.to(args.device)
-    output_sequences = model.generate(input_ids, max_length=1024)
+    output_sequences = model.generate(
+        input_ids, no_repeat_ngram_size=3, max_length=1024
+    )
     generated_text = tokenizer.decode(
         output_sequences[0], skip_special_tokens=True
     )
@@ -66,7 +60,8 @@ demo = gr.Interface(
     fn=greet,
     inputs=[gr.Textbox(lines=4, placeholder="Keywords Here"),
             gr.Slider(1, 20, step=1)],
-    outputs=[gr.Textbox(lines=4),  gr.Image(shape=(200, 200))]
+    outputs=[gr.Textbox(lines=4, label="Prompt"),
+             gr.Image(shape=(200, 200), label="Karlo")]
 )
 
 demo.launch()
