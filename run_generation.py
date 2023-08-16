@@ -326,6 +326,11 @@ def main():
         help="temperature of 1.0 has no effect, lower tend toward greedy sampling",
     )
     parser.add_argument(
+        "--do_sample",
+        action="store_true",
+    )
+    parser.add_argument("--no_repeat_ngram_size", type=int, default=0)
+    parser.add_argument(
         "--repetition_penalty", type=float, default=1.0, help="primarily useful for CTRL model; in that case, use 1.2"
     )
     parser.add_argument("--k", type=int, default=0)
@@ -441,8 +446,9 @@ def main():
         top_k=args.k,
         top_p=args.p,
         repetition_penalty=args.repetition_penalty,
-        do_sample=True,
+        do_sample=args.do_sample,
         num_return_sequences=args.num_return_sequences,
+        no_repeat_ngram_size=args.no_repeat_ngram_size,
     )
 
     # Remove the batch dimension when returning multiple sequences
