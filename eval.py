@@ -1,6 +1,5 @@
 from transformers import GPT2LMHeadModel, GPT2Tokenizer
 from pytorch_lightning import seed_everything
-from dataclasses import dataclass, field
 from datasets import load_from_disk
 import evaluate
 import argparse

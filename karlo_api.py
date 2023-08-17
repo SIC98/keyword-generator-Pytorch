@@ -1,7 +1,5 @@
 import requests
 import json
-import urllib
-from PIL import Image
 
 REST_API_KEY = 'c53a3bd9609b7a2dabc7d1a95083248f'
 
