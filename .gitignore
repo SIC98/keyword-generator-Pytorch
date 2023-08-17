@@ -245,3 +245,8 @@ pip-selfcheck.json
 
 # WandB
 wandb/
+
+# ckpt files
+results/
+lexica-data/
+bart-coco/
