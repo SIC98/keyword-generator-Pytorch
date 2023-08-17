@@ -1,0 +1,49 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Python: Current File",
+            "type": "python",
+            "request": "launch",
+            "program": "${file}",
+            "args": [
+                "--model_name_or_path",
+                "gpt2",
+                "--dataset_name",
+                "Gustavosta/Stable-Diffusion-Prompts",
+                "--per_device_train_batch_size",
+                "8",
+                "--per_device_eval_batch_size",
+                "8",
+                "--torch_dtype",
+                "bfloat16",
+                "--num_train_epochs",
+                "5",
+                "--do_train",
+                "--do_eval",
+                "--output_dir",
+                "./results/exp3",
+                "--save_steps",
+                "500",
+                "--evaluation_strategy",
+                "steps",
+                "--eval_steps",
+                "500",
+                "--learning_rate",
+                "4e-4",
+                // run_generation.py
+                // "--model_type",
+                // "gpt2",
+                // "--model_name_or_path",
+                // "./results/exp3/checkpoint-9000",
+                // "--length",
+                // "1000",
+                // "--fp16",
+            ],
+            "justMyCode": true
+        }
+    ]
+}
