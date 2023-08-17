@@ -2,7 +2,7 @@ from collections import defaultdict, Counter
 from datasets import load_dataset
 from utils import preprocess
 
-dataset = load_dataset('Gustavosta/Stable-Diffusion-Prompts')
+dataset = load_dataset("Gustavosta/Stable-Diffusion-Prompts")
 dataset = dataset.map(preprocess)
 
 
@@ -20,6 +20,6 @@ def find_duplicate_ngrams(text, n):
 
 
 duplicates = [len(find_duplicate_ngrams(text, 3))
-              for text in dataset['train']['Prompt']]
+              for text in dataset["train"]["Prompt"]]
 
 print(Counter(duplicates))
