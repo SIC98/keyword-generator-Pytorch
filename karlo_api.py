@@ -1,7 +1,7 @@
 import requests
 import json
 
-REST_API_KEY = 'c53a3bd9609b7a2dabc7d1a95083248f'
+REST_API_KEY = "REST_API_KEY"
 
 
 def t2i(prompt, negative_prompt):
