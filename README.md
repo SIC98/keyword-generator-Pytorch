@@ -10,7 +10,7 @@ Generate keywords describing an image in an autoregressive manner.
 
 ## Features
 1. Use crawled Lexica dataset: [Gustavosta/Stable-Diffusion-Prompts](https://huggingface.co/datasets/Gustavosta/Stable-Diffusion-Prompts)
-2. Fine-tuning GPT2 model based on `run_clm.py` script and run text generation by running `run_generation.py` script with some modifications.
+2. Fine-tuning GPT2 model based on [run_clm.py](https://github.com/huggingface/transformers/blob/main/examples/pytorch/language-modeling/run_clm.py) script and run text generation by running [run_generation.py](https://github.com/huggingface/transformers/blob/main/examples/pytorch/text-generation/run_generation.py) script with some modifications.
     - The original code groups the dataset in chunks of 1,000 using the `group_texts` function and concatenates them. During this process, our dataset utilizes multiple prompts at once as input to the model. This is not the method I intended for training. I removed that code and implemented an appropriate token preprocessing function.
     - The GPT2 vocab has only one special token, which is the `eos_token` used for padding.
     - An accuracy metric function is used. Padding is not considered in the calculation.
