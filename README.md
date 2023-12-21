@@ -28,3 +28,54 @@ Generate keywords describing an image in an autoregressive manner.
 - If you want creative results, greedy search may not be appropriate.
 - In my dataset, the proportion of data containing duplicated bigrams is 13.71%, and the proportion with duplicated trigrams is 2.6%. Therefore, I have set the 'No repeat ngram size' value to 3. The duplicated trigram helps prevent the repetition of keywords.
 
+## Result
+
+Using the Karlo API, it's possible to generate images using the keywords created by the model as prompts.
+
+![result](https://github.com/SIC98/keyword-generator-Pytorch/assets/51232785/e474e912-374e-40ff-9f91-e2af45313f40)
+
+## How to run my code
+
+1. Fine-tuning GPT2 model
+```
+python run_clm.py \
+	--model_name_or_path=gpt2 \
+	--dataset_name=Gustavosta/Stable-Diffusion-Prompts \
+	--per_device_train_batch_size=16 \
+	--per_device_eval_batch_size=16 \
+	--torch_dtype=bfloat16 \
+	--num_train_epochs=10 \
+	--learning_rate=4e-4 \
+	--do_train \
+	--do_eval \
+	--output_dir=results \
+	--save_steps=4000 \
+	--evaluation_strategy=steps \
+	--eval_steps=4000
+```
+2. Evaluate the model's ROUGE score. It should be run after executing run_clm.py. My code evaluates the model using beam search (beam size = 5). You can test other generation strategies by modifying the `batch_inference()` function in `utils.py`.
+```
+python eval.py \
+	--model_name_or_path=<path_of_ckpt> \
+	--input_type="two_keyword" \
+	--batch_size=128 \
+	--fp16 \
+	--device="cuda"
+```
+3. Perform GPT2 model inference.
+```
+python run_generation.py \
+	--model_name_or_path=<ckpt_path> \
+	--fp16 \
+  --model_type=gpt2 \
+	--prompt=<prompt> \
+	--length=<length> \
+	--no_repeat_ngram_size=3
+```
+4. In `karlo_api.py`, after entering the `REST_API_KEY`, you can run the Gradio app.
+```
+python run_gradio.py \
+	--model_name_or_path=<path_of_ckpt> \
+	--fp16 \
+	--device="cuda"
+```
